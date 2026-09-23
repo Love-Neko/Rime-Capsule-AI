@@ -38,14 +38,37 @@
 
     <!-- 实时候选条动态预览区 -->
     <section class="preview-section">
-      <div class="section-badge">实时候选条渲染预览 (Live Preview)</div>
-      <div class="preview-box-wrapper">
-        <div class="preedit-line" id="preview-preedit">jian jian de jiu bu zai yi le</div>
+      <div class="preview-header-bar">
+        <div class="section-badge">实时候选条渲染预览 (Live Preview)</div>
+        <div class="preview-scene-switcher" id="scene-switcher">
+          <button type="button" class="scene-btn active" data-scene="jev">✦ Jev AI 智能召唤 (汽车qi you)</button>
+          <button type="button" class="scene-btn" data-scene="octagram">∞ 400MB 语法模型 (渐渐地...)</button>
+        </div>
+        <button type="button" class="btn-screenshot-toggle" id="btn-toggle-screenshot" title="查看真实打字效果截图">
+          <span>📸 真实上屏实测图</span>
+        </button>
+      </div>
+
+      <div class="preview-box-wrapper" id="preview-wrapper">
+        <div class="preedit-line" id="preview-preedit">汽车qi you</div>
         <div class="candidate-bar" id="preview-bar">
           <!-- 动态渲染候选词 -->
         </div>
       </div>
-      <div class="preview-hint">以上效果完全基于当前设置的字体、字号、暗黑胶囊主题及候选词数量动态绘制</div>
+
+      <!-- 真实截图查看器抽屉 -->
+      <div id="screenshot-viewer" class="screenshot-viewer" style="display: none;">
+        <div class="screenshot-viewer-header">
+          <span class="sv-title">小狼毫 + Jev AI 真实打字上屏实测效果</span>
+          <button type="button" class="btn-close-viewer" id="btn-close-screenshot">✕ 关闭截图</button>
+        </div>
+        <div class="screenshot-viewer-body">
+          <img src="/assets/jev_preview.png" alt="Jev AI 真实打字效果截图" class="screenshot-img">
+          <p class="screenshot-caption">实测按 Tab 智能召唤 Jev AI：首选精准重排推荐「汽油」并附带 ✦ Jev 蓝色高亮，第 2~7 候选词承接常规候选项</p>
+        </div>
+      </div>
+
+      <div class="preview-hint">以上效果完全基于当前设置的字体、字号、配色方案及候选词数量动态绘制</div>
     </section>
 
     <!-- 主配置表单栅格 -->
@@ -61,10 +84,92 @@
         </div>
         <div class="card-body">
           <div class="form-group">
-            <label>预设主题配色</label>
-            <div class="segmented-control" id="theme-control">
-              <button type="button" class="segment-btn active" data-value="mac_minimal_dark">极简暗黑胶囊 (默认)</button>
-              <button type="button" class="segment-btn" data-value="mac_minimal_light">极简浅色胶囊</button>
+            <label>预设主题配色方案</label>
+            <div class="theme-grid" id="theme-control">
+              <button type="button" class="theme-card active" data-value="mac_minimal_dark">
+                <span class="theme-dot" style="background: #201E1E; border: 1px solid #423C3C;"></span>
+                <span class="theme-name">极简暗黑 (默认)</span>
+              </button>
+              <button type="button" class="theme-card" data-value="mac_minimal_light">
+                <span class="theme-dot" style="background: #F5F5F7; border: 1px solid #D5D5DA;"></span>
+                <span class="theme-name">极简浅色胶囊</span>
+              </button>
+              <button type="button" class="theme-card" data-value="macos_monterey">
+                <span class="theme-dot" style="background: #161922; border: 1px solid #0AA5FF;"></span>
+                <span class="theme-name">深空蓝夜</span>
+              </button>
+              <button type="button" class="theme-card" data-value="catppuccin_mocha">
+                <span class="theme-dot" style="background: #1E1E2E; border: 1px solid #FEB4BE;"></span>
+                <span class="theme-name">莫卡暗夜</span>
+              </button>
+              <button type="button" class="theme-card" data-value="tokyo_night">
+                <span class="theme-dot" style="background: #1A1B26; border: 1px solid #7ABADB;"></span>
+                <span class="theme-name">东京之夜</span>
+              </button>
+              <button type="button" class="theme-card" data-value="nord_dark">
+                <span class="theme-dot" style="background: #2E3440; border: 1px solid #88C0D0;"></span>
+                <span class="theme-name">北极极光</span>
+              </button>
+              <button type="button" class="theme-card" data-value="sakura_pink">
+                <span class="theme-dot" style="background: #FFF5F8; border: 1px solid #E8BEDC;"></span>
+                <span class="theme-name">樱花浅粉</span>
+              </button>
+              <button type="button" class="theme-card" data-value="custom">
+                <span class="theme-dot" style="background: linear-gradient(135deg, #FF6B6B, #4ECDC4);"></span>
+                <span class="theme-name">🎨 自定义配色</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 自定义配色实时调色板抽屉 -->
+          <div id="custom-palette-drawer" class="custom-palette-box" style="display: none;">
+            <div class="custom-palette-header">
+              <span class="palette-title">🎨 实时自由调色板</span>
+              <span class="palette-hint">修改后上方实时候选条立即预览，保存即生效</span>
+            </div>
+            <div class="color-pickers-grid">
+              <div class="color-item">
+                <label>窗口背景底色</label>
+                <div class="color-input-wrap">
+                  <input type="color" id="cp-back" value="#1E1E20">
+                  <input type="text" id="cp-back-hex" class="hex-text" value="#1E1E20">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>外边框颜色</label>
+                <div class="color-input-wrap">
+                  <input type="color" id="cp-border" value="#2C2C30">
+                  <input type="text" id="cp-border-hex" class="hex-text" value="#2C2C30">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>高亮选中胶囊背景</label>
+                <div class="color-input-wrap">
+                  <input type="color" id="cp-hilite-back" value="#3C3C42">
+                  <input type="text" id="cp-hilite-back-hex" class="hex-text" value="#3C3C42">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>高亮选中文字颜色</label>
+                <div class="color-input-wrap">
+                  <input type="color" id="cp-hilite-text" value="#FFFFFF">
+                  <input type="text" id="cp-hilite-text-hex" class="hex-text" value="#FFFFFF">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>普通候选文字颜色</label>
+                <div class="color-input-wrap">
+                  <input type="color" id="cp-cand-text" value="#D8D8DC">
+                  <input type="text" id="cp-cand-text-hex" class="hex-text" value="#D8D8DC">
+                </div>
+              </div>
+              <div class="color-item">
+                <label>序号与注释颜色</label>
+                <div class="color-input-wrap">
+                  <input type="color" id="cp-label" value="#787880">
+                  <input type="text" id="cp-label-hex" class="hex-text" value="#787880">
+                </div>
+              </div>
             </div>
           </div>
 
@@ -274,6 +379,85 @@
                 <span id="btn-download-text">一键下载 / 校验 400MB 模型</span>
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 5：本地自定义词库与快捷短语 -->
+      <div class="card card-full-width">
+        <div class="card-header">
+          <div class="card-icon">📖</div>
+          <div class="card-header-main">
+            <h2>本地自定义词库与快捷短语</h2>
+            <p>custom_phrase.dict.yaml · 支持输入简码快速输出邮箱/长句/时间动态宏</p>
+          </div>
+          <div class="card-header-actions">
+            <div class="segmented-control mode-switch" id="phrase-mode-switch">
+              <button type="button" class="segment-btn active" id="btn-phrase-mode-table">可视化表格</button>
+              <button type="button" class="segment-btn" id="btn-phrase-mode-raw">原始 YAML 源码</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- 表格模式 -->
+          <div id="phrase-table-view">
+            <!-- 快速添加栏 -->
+            <div class="phrase-add-bar">
+              <input type="text" id="input-phrase-text" class="mac-input" placeholder="短语内容 (如: yang3346169171@gmail.com 或 微信支付)">
+              <input type="text" id="input-phrase-code" class="mac-input code-input" placeholder="拼音简码 (如: mail)">
+              <input type="number" id="input-phrase-weight" class="mac-input weight-input" value="5" min="1" max="100" title="排序权重 (1~100，默认 5)">
+              <button type="button" class="btn-primary" id="btn-add-phrase">
+                <span>＋ 添加词条</span>
+              </button>
+            </div>
+
+            <!-- 动态宏快捷填入胶囊 -->
+            <div class="macro-shortcuts">
+              <span class="macro-label">快速插入动态宏:</span>
+              <button type="button" class="macro-chip" data-text="\Y-\m-\d \D" data-code="rq">📅 日期 (\Y-\m-\d \D)</button>
+              <button type="button" class="macro-chip" data-text="\T\K" data-code="csck">⏰ 时辰 (\T\K)</button>
+              <button type="button" class="macro-chip" data-text="哈\5" data-code="hhhhh">🔁 重复 (哈\5)</button>
+              <button type="button" class="macro-chip" data-text="换行一\n换行二" data-code="hh">↵ 换行 (\n)</button>
+            </div>
+
+            <!-- 搜索过滤与计数 -->
+            <div class="phrase-filter-row">
+              <input type="text" id="input-phrase-filter" class="mac-input filter-input" placeholder="🔍 搜索词条文字或拼音简码...">
+              <span class="phrase-count-badge" id="phrase-count-badge">共 0 条</span>
+            </div>
+
+            <!-- 词条列表表格容器 -->
+            <div class="phrase-table-container">
+              <table class="phrase-table">
+                <thead>
+                  <tr>
+                    <th>词条 / 短语内容 (支持动态宏)</th>
+                    <th style="width: 140px;">拼音简码</th>
+                    <th style="width: 90px;">权重</th>
+                    <th style="width: 90px; text-align: center;">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="phrase-table-body">
+                  <!-- 动态插入行 -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 源码编辑模式 -->
+          <div id="phrase-raw-view" style="display: none;">
+            <div class="raw-edit-hint">
+              提示：每行格式为 <code>短语内容&lt;Tab&gt;拼音简码&lt;Tab&gt;权重</code>。以 <code>#</code> 开头为注释行。
+            </div>
+            <textarea id="phrase-raw-textarea" class="mac-textarea" rows="14" spellcheck="false"></textarea>
+          </div>
+
+          <!-- 词库底部保存操作栏 -->
+          <div class="phrase-footer-actions">
+            <span class="phrase-sync-hint">词库更新后将同步写入 <code>rime_config</code> 与当前系统小狼毫目录</span>
+            <button type="button" class="btn-secondary" id="btn-save-phrase">
+              <span>💾 保存词库更改</span>
+            </button>
           </div>
         </div>
       </div>

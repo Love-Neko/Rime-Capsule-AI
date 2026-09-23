@@ -28,6 +28,14 @@ def get_default_config():
         "font_face": "PingFang SC Bold, PingFang SC Medium, PingFang SC, Microsoft YaHei UI, Segoe UI",
         "font_point": 12,
         "color_scheme": "mac_minimal_dark",
+        "custom_colors": {
+            "back_color": "#1E1E20",
+            "border_color": "#2C2C30",
+            "hilited_candidate_back_color": "#3C3C42",
+            "hilited_candidate_text_color": "#FFFFFF",
+            "candidate_text_color": "#D8D8DC",
+            "label_color": "#787880"
+        },
         "horizontal": True,
         "tab_jev_ai": True,
         "wanxiang_enabled": True
@@ -160,12 +168,49 @@ patch:
     return content
 
 
+def hex_to_weasel_color(hex_str: str, default: str = "0x201E1E") -> str:
+    """将 CSS Hex 颜色 (#RRGGBB) 转换为小狼毫原生 BGR 格式 (0xBBGGRR)"""
+    if not hex_str:
+        return default
+    h = hex_str.strip().lstrip("#")
+    if len(h) == 6:
+        r, g, b = h[0:2], h[2:4], h[4:6]
+        return f"0x{b.upper()}{g.upper()}{r.upper()}"
+    return default
+
+
 def generate_weasel_custom_yaml(config):
     """根据配置生成 weasel.custom.yaml"""
     font_face = config.get("font_face", "PingFang SC Bold, PingFang SC Medium, PingFang SC, Microsoft YaHei UI, Segoe UI")
     font_point = config.get("font_point", 12)
     horizontal = "true" if config.get("horizontal", True) else "false"
     color_scheme = config.get("color_scheme", "mac_minimal_dark")
+
+    custom_colors = config.get("custom_colors", {})
+    c_back = hex_to_weasel_color(custom_colors.get("back_color", "#1E1E20"), "0x201E1E")
+    c_border = hex_to_weasel_color(custom_colors.get("border_color", "#2C2C30"), "0x302C2C")
+    c_hilite_back = hex_to_weasel_color(custom_colors.get("hilited_candidate_back_color", "#3C3C42"), "0x423C3C")
+    c_hilite_text = hex_to_weasel_color(custom_colors.get("hilited_candidate_text_color", "#FFFFFF"), "0xFFFFFF")
+    c_cand_text = hex_to_weasel_color(custom_colors.get("candidate_text_color", "#D8D8DC"), "0xDCD8D8")
+    c_label = hex_to_weasel_color(custom_colors.get("label_color", "#787880"), "0x807878")
+
+    custom_block = f"""
+  "preset_color_schemes/custom":
+    name: "User Custom / 自由自定义配色"
+    author: "User"
+    back_color: {c_back}
+    border_color: {c_border}
+    shadow_color: 0x60000000
+    text_color: {c_cand_text}
+    hilited_text_color: {c_hilite_text}
+    hilited_back_color: {c_back}
+    candidate_text_color: {c_cand_text}
+    label_color: {c_label}
+    comment_text_color: {c_label}
+    hilited_candidate_back_color: {c_hilite_back}
+    hilited_candidate_text_color: {c_hilite_text}
+    hilited_candidate_label_color: {c_hilite_text}
+    hilited_comment_text_color: {c_label}""" if color_scheme == "custom" else ""
 
     content = f"""# weasel.custom.yaml - 自动生成主题配置
 patch:
@@ -232,6 +277,92 @@ patch:
     hilited_candidate_text_color: 0x000000
     hilited_candidate_label_color: 0x1D1D1F
     hilited_comment_text_color: 0x007AFF
+
+  "preset_color_schemes/macos_monterey":
+    name: "macOS Monterey / 深空蓝夜"
+    author: "Apple"
+    back_color: 0x221916
+    border_color: 0x382A22
+    shadow_color: 0x60000000
+    text_color: 0xFFFFFF
+    hilited_text_color: 0xFFFFFF
+    hilited_back_color: 0x221916
+    candidate_text_color: 0xD8D2D0
+    label_color: 0x887870
+    comment_text_color: 0x887870
+    hilited_candidate_back_color: 0xFFA50A
+    hilited_candidate_text_color: 0xFFFFFF
+    hilited_candidate_label_color: 0xFFFFFF
+    hilited_comment_text_color: 0xFFE0B0
+
+  "preset_color_schemes/catppuccin_mocha":
+    name: "Catppuccin Mocha / 莫卡暗夜"
+    author: "Catppuccin"
+    back_color: 0x2E1E1E
+    border_color: 0x473B31
+    shadow_color: 0x60000000
+    text_color: 0xF5E0C6
+    hilited_text_color: 0xFFFFFF
+    hilited_back_color: 0x2E1E1E
+    candidate_text_color: 0xEDE0CD
+    label_color: 0x8C7C6C
+    comment_text_color: 0x8C7C6C
+    hilited_candidate_back_color: 0x5A4745
+    hilited_candidate_text_color: 0xFFFFFF
+    hilited_candidate_label_color: 0xF5E0C6
+    hilited_comment_text_color: 0xFEB4BE
+
+  "preset_color_schemes/tokyo_night":
+    name: "Tokyo Night / 东京之夜"
+    author: "TokyoNight"
+    back_color: 0x261B1A
+    border_color: 0x3E2C24
+    shadow_color: 0x60000000
+    text_color: 0xE0D0C0
+    hilited_text_color: 0xFFFFFF
+    hilited_back_color: 0x261B1A
+    candidate_text_color: 0xD5C0A9
+    label_color: 0x7E6856
+    comment_text_color: 0x7E6856
+    hilited_candidate_back_color: 0x573428
+    hilited_candidate_text_color: 0xFFFFFF
+    hilited_candidate_label_color: 0xD0E0FF
+    hilited_comment_text_color: 0xDDBA7A
+
+  "preset_color_schemes/nord_dark":
+    name: "Nord Dark / 北极极光"
+    author: "Arctic"
+    back_color: 0x40342E
+    border_color: 0x4C433B
+    shadow_color: 0x60000000
+    text_color: 0xECE8E5
+    hilited_text_color: 0xFFFFFF
+    hilited_back_color: 0x40342E
+    candidate_text_color: 0xE6DFD8
+    label_color: 0x907C61
+    comment_text_color: 0x907C61
+    hilited_candidate_back_color: 0x5E4C43
+    hilited_candidate_text_color: 0xFFFFFF
+    hilited_candidate_label_color: 0xE5E8EC
+    hilited_comment_text_color: 0xD0C088
+
+  "preset_color_schemes/sakura_pink":
+    name: "Sakura Pink / 樱花浅粉"
+    author: "Sakura"
+    back_color: 0xF8F5FF
+    border_color: 0xE8D5E5
+    shadow_color: 0x30000000
+    text_color: 0x3B2030
+    hilited_text_color: 0x301525
+    hilited_back_color: 0xF8F5FF
+    candidate_text_color: 0x5C404E
+    label_color: 0x9A808C
+    comment_text_color: 0x9A808C
+    hilited_candidate_back_color: 0xDCBEE8
+    hilited_candidate_text_color: 0x301525
+    hilited_candidate_label_color: 0x5C404E
+    hilited_comment_text_color: 0x8C4070
+{custom_block}
 """
     return content
 
@@ -248,7 +379,7 @@ def sync_and_deploy(config):
     (rime_cfg / "weasel.custom.yaml").write_text(generate_weasel_custom_yaml(config), encoding="utf-8")
 
     # 2. 复制配置与必要文件到 RIME_USER_DIR
-    for item in ["default.custom.yaml", "wanxiang.custom.yaml", "weasel.custom.yaml"]:
+    for item in ["default.custom.yaml", "wanxiang.custom.yaml", "weasel.custom.yaml", "custom_phrase.dict.yaml"]:
         src = rime_cfg / item
         if src.exists():
             shutil.copy2(src, RIME_USER_DIR / item)

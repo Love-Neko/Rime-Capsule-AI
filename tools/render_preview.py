@@ -70,7 +70,7 @@ def main():
         "--disable-gpu",
         "--hide-scrollbars",
         "--force-device-scale-factor=2",
-        "--window-size=1200,1680",
+        "--window-size=1200,2150",
         "--virtual-time-budget=3000",
         f"--screenshot={str(output_png)}",
         url

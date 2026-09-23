@@ -24,10 +24,85 @@ ENV_EXAMPLE = ROOT_DIR / ".env.example"
 
 # 动态加载工具模块
 sys.path.insert(0, str(ROOT_DIR))
-from tools.deploy import get_default_config, sync_and_deploy
+from tools.deploy import get_default_config, sync_and_deploy, RIME_USER_DIR
 from tools.download_model import download_grammar_model, get_default_dest, EXPECTED_SIZE
 from tools.patch_icons import run_patch
 from tools.autostart import is_autostart_enabled, enable_autostart, disable_autostart
+
+def get_custom_phrase_file():
+    """获取自定义词库文件路径（优先使用系统 Rime 目录中的，若不存在则使用项目 rime_config）"""
+    target = RIME_USER_DIR / "custom_phrase.dict.yaml"
+    if target.exists():
+        return target
+    return ROOT_DIR / "rime_config" / "custom_phrase.dict.yaml"
+
+def parse_custom_phrase(content: str):
+    """解析 custom_phrase.dict.yaml 内容，提取词条列表"""
+    entries = []
+    lines = content.splitlines()
+    in_entries = False
+    for line in lines:
+        stripped = line.strip()
+        if not in_entries:
+            if stripped == "...":
+                in_entries = True
+            continue
+        if not stripped or stripped.startswith("#"):
+            continue
+        parts = line.split("\t")
+        if len(parts) >= 2:
+            text = parts[0].strip()
+            code = parts[1].strip()
+            weight = parts[2].strip() if len(parts) >= 3 else "5"
+            entries.append({"text": text, "code": code, "weight": weight})
+    return entries
+
+def build_custom_phrase_yaml(entries: list) -> str:
+    """由词条列表重新构建带有完整万象动态宏注释的 custom_phrase.dict.yaml"""
+    header = """# Rime dictionary
+# encoding: utf-8
+# 
+# 为应对9键、14键、18键等场景下使用用户词
+# 用户词库变更为bin引用，而不是userdb-table
+
+# 【万象候选动态格式化说明】
+# --------------------------------------------------
+# 1. 时间占位 ( \\ + 字母 )
+# \\T:时辰(午时)  \\K:刻(三刻)
+# \\Y:年(2025)    \\y:年(25)     \\m:月(01)    \\N:月(1)
+# \\d:日(09)      \\j:日(9)      \\H:时(08)    \\G:时(8)
+# \\I:时(12h)     \\l:时(12h不带零)
+# \\C:中文星期全称(星期一)  \\D:中文星期简称(周一)
+# \\E:英文星期全称(Monday)  \\F:英文星期简称(Mon)
+# \\w:ISO周数(10)
+# \\M:分(05)      \\S:秒(09)     \\p:am/pm     \\P:AM/PM
+# \\O:时区(+08:00) \\o:时区(+0800) \\A:凌晨/上午/中午/下午/晚上
+# --------------------------------------------------
+# 2. 数量重复 ( 字符 + \\ + 数字 )
+# a\\3 => aaa     哈\\2 => 哈哈     !\\10 => !!!!!
+# --------------------------------------------------
+# 3. 基础转义
+# \\n : 换行符    \\s : 空格    \\t : 制表符
+# [[...]] : 区块内不转义 (如: [[\\Y]] 输出 \\Y)
+# --------------------------------------------------
+# 示例: 编码 csck -> 此时此刻：\\T\\K  =>  此时此刻：午时三刻
+# 示例: 编码 rq -> \\Y-\\m-\\d \\D  =>  2025-03-12 周三
+---
+name: custom_phrase
+version: "LTS"
+sort: by_weight
+use_preset_vocabulary: false
+...
+"""
+    body_lines = []
+    for item in entries:
+        t = str(item.get("text", "")).strip()
+        c = str(item.get("code", "")).strip()
+        w = str(item.get("weight", "5")).strip()
+        if t and c:
+            body_lines.append(f"{t}\t{c}\t{w}")
+    return header + "\n".join(body_lines) + "\n"
+
 
 # 全局模型下载状态追踪
 download_state = {
@@ -124,6 +199,22 @@ class SettingsHandler(SimpleHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
 
+        if path.startswith("/assets/"):
+            rel_path = path.lstrip("/").replace("/", os.sep)
+            file_path = ROOT_DIR / rel_path
+            if file_path.exists() and file_path.is_file():
+                content = file_path.read_bytes()
+                mime = "image/png" if file_path.suffix.lower() == ".png" else "image/x-icon" if file_path.suffix.lower() == ".ico" else "application/octet-stream"
+                self.send_response(200)
+                self.send_header("Content-Type", mime)
+                self.send_header("Content-Length", str(len(content)))
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            else:
+                self.send_error(404, "File Not Found")
+                return
+
         if path == "/api/config":
             cfg = load_settings()
             env_vars = load_env()
@@ -180,6 +271,16 @@ class SettingsHandler(SimpleHTTPRequestHandler):
 
         elif path == "/api/autostart":
             self.send_json({"ok": True, "enabled": is_autostart_enabled()})
+            return
+
+        elif path == "/api/custom_phrase":
+            try:
+                target_file = get_custom_phrase_file()
+                content = target_file.read_text(encoding="utf-8") if target_file.exists() else ""
+                entries = parse_custom_phrase(content)
+                self.send_json({"ok": True, "raw": content, "entries": entries})
+            except Exception as e:
+                self.send_json({"ok": False, "message": str(e), "entries": []}, code=500)
             return
 
         # 默认静态页面
@@ -282,6 +383,28 @@ class SettingsHandler(SimpleHTTPRequestHandler):
             enable = bool(payload.get("enable", False))
             ok, msg = enable_autostart() if enable else disable_autostart()
             self.send_json({"ok": ok, "message": msg, "enabled": is_autostart_enabled()})
+            return
+
+        elif path == "/api/custom_phrase":
+            try:
+                raw_content = payload.get("raw")
+                if raw_content is None and "entries" in payload:
+                    raw_content = build_custom_phrase_yaml(payload["entries"])
+                if raw_content is not None:
+                    # 保存到项目 rime_config
+                    cfg_path = ROOT_DIR / "rime_config" / "custom_phrase.dict.yaml"
+                    cfg_path.parent.mkdir(parents=True, exist_ok=True)
+                    cfg_path.write_text(raw_content, encoding="utf-8")
+
+                    # 同步到系统 Rime 目录
+                    if RIME_USER_DIR.exists():
+                        (RIME_USER_DIR / "custom_phrase.dict.yaml").write_text(raw_content, encoding="utf-8")
+
+                    self.send_json({"ok": True, "message": "自定义词库已成功保存！点击【保存并一键部署】或重新部署后生效。"})
+                else:
+                    self.send_json({"ok": False, "message": "无效的数据内容"}, code=400)
+            except Exception as e:
+                self.send_json({"ok": False, "message": f"保存词库失败：{str(e)}"}, code=500)
             return
 
         self.send_json({"ok": False, "message": "未知 API"}, code=404)

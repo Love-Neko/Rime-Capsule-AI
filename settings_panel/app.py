@@ -13,6 +13,7 @@ import socket
 import threading
 import webbrowser
 import urllib.parse
+import subprocess
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
@@ -24,7 +25,7 @@ ENV_EXAMPLE = ROOT_DIR / ".env.example"
 
 # 动态加载工具模块
 sys.path.insert(0, str(ROOT_DIR))
-from tools.deploy import get_default_config, sync_and_deploy, RIME_USER_DIR
+from tools.deploy import get_default_config, sync_and_deploy, RIME_USER_DIR, WEASEL_DIR
 from tools.download_model import download_grammar_model, get_default_dest, EXPECTED_SIZE
 from tools.patch_icons import run_patch
 from tools.autostart import is_autostart_enabled, enable_autostart, disable_autostart
@@ -400,7 +401,19 @@ class SettingsHandler(SimpleHTTPRequestHandler):
                     if RIME_USER_DIR.exists():
                         (RIME_USER_DIR / "custom_phrase.dict.yaml").write_text(raw_content, encoding="utf-8")
 
-                    self.send_json({"ok": True, "message": "自定义词库已成功保存！点击【保存并一键部署】或重新部署后生效。"})
+                    deploy_msg = "自定义词库已成功保存！"
+                    deployer_exe = WEASEL_DIR / "WeaselDeployer.exe"
+                    if deployer_exe.exists():
+                        try:
+                            subprocess.run(f'"{deployer_exe}" /deploy', shell=True, timeout=30, capture_output=True)
+                            server_exe = WEASEL_DIR / "WeaselServer.exe"
+                            if server_exe.exists():
+                                subprocess.Popen([str(server_exe)], creationflags=0x08000000)
+                            deploy_msg = "自定义词库已成功保存并即时重新编译生效！可在任意窗口输入测试。"
+                        except Exception as ex:
+                            deploy_msg = f"词库已保存，但自动编译发生异常：{str(ex)}，可点击右下角一键部署。"
+
+                    self.send_json({"ok": True, "message": deploy_msg})
                 else:
                     self.send_json({"ok": False, "message": "无效的数据内容"}, code=400)
             except Exception as e:

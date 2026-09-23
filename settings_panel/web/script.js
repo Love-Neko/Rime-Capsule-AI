@@ -2,7 +2,9 @@
 
 let currentConfig = {
   page_size: 8,
-  ctrl_switch: true,
+  switch_key: "shift_both",
+  switch_action: "commit_code",
+  ctrl_switch: false,
   ascii_punct: true,
   paging_keys: "bracket",
   font_face: "PingFang SC Bold, PingFang SC Medium, PingFang SC, Microsoft YaHei UI, Segoe UI",
@@ -212,12 +214,28 @@ function applyConfigToUI(cfg) {
   const badge = document.getElementById("fontsize-val");
   if (badge && cfg.font_point) badge.innerText = cfg.font_point + " pt";
 
-  // 开关类
+  // 开关与按键类
   document.getElementById("switch-horizontal").checked = cfg.horizontal !== false;
-  document.getElementById("switch-ctrl").checked = !!cfg.ctrl_switch;
   document.getElementById("switch-punct").checked = !!cfg.ascii_punct;
   document.getElementById("switch-tab-jev").checked = cfg.tab_jev_ai !== false;
   document.getElementById("switch-wanxiang").checked = cfg.wanxiang_enabled !== false;
+
+  // 中英文切换按键与动作
+  const switchKeySelect = document.getElementById("switch-key-select");
+  if (switchKeySelect) {
+    if (cfg.switch_key) {
+      switchKeySelect.value = cfg.switch_key;
+    } else if (cfg.ctrl_switch) {
+      switchKeySelect.value = "ctrl_both";
+    } else {
+      switchKeySelect.value = "shift_both";
+    }
+  }
+
+  const switchActionSelect = document.getElementById("switch-action-select");
+  if (switchActionSelect && cfg.switch_action) {
+    switchActionSelect.value = cfg.switch_action;
+  }
 
   // 翻页按键
   const pagingSelect = document.getElementById("paging-select");
@@ -491,9 +509,21 @@ function bindEvents() {
     currentConfig.horizontal = e.target.checked;
     renderPreview();
   });
-  document.getElementById("switch-ctrl").addEventListener("change", (e) => {
-    currentConfig.ctrl_switch = e.target.checked;
-  });
+  // 中英文切换按键与动作监听
+  const switchKeySelect = document.getElementById("switch-key-select");
+  if (switchKeySelect) {
+    switchKeySelect.addEventListener("change", (e) => {
+      currentConfig.switch_key = e.target.value;
+      currentConfig.ctrl_switch = (e.target.value === "ctrl_both" || e.target.value === "ctrl_l" || e.target.value === "ctrl_r");
+    });
+  }
+
+  const switchActionSelect = document.getElementById("switch-action-select");
+  if (switchActionSelect) {
+    switchActionSelect.addEventListener("change", (e) => {
+      currentConfig.switch_action = e.target.value;
+    });
+  }
   document.getElementById("switch-punct").addEventListener("change", (e) => {
     currentConfig.ascii_punct = e.target.checked;
   });

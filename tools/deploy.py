@@ -22,7 +22,9 @@ def get_default_config():
     """获取出厂开源默认配置（暗黑胶囊主题，8个候选词，其余标准默认）"""
     return {
         "page_size": 8,
-        "ctrl_switch": False,
+        "switch_key": "shift_both",       # "shift_both" | "shift_l" | "shift_r" | "ctrl_both" | "ctrl_l" | "ctrl_r" | "none"
+        "switch_action": "commit_code",   # "commit_code" | "clear" | "inline_ascii" | "commit_text"
+        "ctrl_switch": False,             # 保留向后兼容
         "ascii_punct": False,
         "paging_keys": "minus_equal",     # "minus_equal" | "bracket" | "comma_dot"
         "font_face": "PingFang SC Bold, PingFang SC Medium, PingFang SC, Microsoft YaHei UI, Segoe UI",
@@ -45,7 +47,6 @@ def get_default_config():
 def generate_default_custom_yaml(config):
     """根据配置生成 default.custom.yaml 文本内容"""
     page_size = config.get("page_size", 5)
-    ctrl_switch = config.get("ctrl_switch", False)
     ascii_punct = config.get("ascii_punct", False)
     paging_keys = config.get("paging_keys", "minus_equal")
     tab_jev_ai = config.get("tab_jev_ai", True)
@@ -57,23 +58,45 @@ def generate_default_custom_yaml(config):
     schemas.append("    - {schema: luna_pinyin_simp}")
     schema_lines = "\n".join(schemas)
 
-    # 快捷键切换
-    if ctrl_switch:
-        switch_block = f"""  ascii_composer/good_old_caps_lock: true
+    # 中英文切换按键自定义配置
+    switch_key = config.get("switch_key")
+    if not switch_key:
+        if config.get("ctrl_switch", False):
+            switch_key = "ctrl_both"
+        else:
+            switch_key = "shift_both"
+
+    action = config.get("switch_action", "commit_code")
+
+    k_shift_l = "noop"
+    k_shift_r = "noop"
+    k_ctrl_l = "noop"
+    k_ctrl_r = "noop"
+
+    if switch_key == "shift_both":
+        k_shift_l = action
+        k_shift_r = action
+    elif switch_key == "shift_l":
+        k_shift_l = action
+    elif switch_key == "shift_r":
+        k_shift_r = action
+    elif switch_key == "ctrl_both":
+        k_ctrl_l = action
+        k_ctrl_r = action
+    elif switch_key == "ctrl_l":
+        k_ctrl_l = action
+    elif switch_key == "ctrl_r":
+        k_ctrl_r = action
+    elif switch_key == "none":
+        pass
+
+    switch_block = f"""  ascii_composer/good_old_caps_lock: true
   ascii_composer/switch_key:
     Caps_Lock: clear
-    Shift_L: noop
-    Shift_R: noop
-    Control_L: commit_code
-    Control_R: commit_code"""
-    else:
-        switch_block = f"""  ascii_composer/good_old_caps_lock: true
-  ascii_composer/switch_key:
-    Caps_Lock: clear
-    Shift_L: inline_ascii
-    Shift_R: commit_text
-    Control_L: noop
-    Control_R: noop"""
+    Shift_L: {k_shift_l}
+    Shift_R: {k_shift_r}
+    Control_L: {k_ctrl_l}
+    Control_R: {k_ctrl_r}"""
 
     # 标点符号映射
     punct_block = ""

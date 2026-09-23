@@ -224,15 +224,27 @@
           </div>
         </div>
         <div class="card-body">
-          <div class="form-group switch-group">
-            <div>
-              <div class="switch-title">单键 Ctrl 极速切换中英文</div>
-              <div class="switch-desc">打完英文按 Ctrl 自动直接上屏并切回中文；彻底屏蔽 Shift 误触</div>
-            </div>
-            <label class="mac-switch">
-              <input type="checkbox" id="switch-ctrl">
-              <span class="slider"></span>
-            </label>
+          <div class="form-group">
+            <label>中英文切换触发按键</label>
+            <select id="switch-key-select" class="mac-select">
+              <option value="shift_both">左右 Shift 均可切换 (默认推荐)</option>
+              <option value="shift_l">仅左 Shift 单键切换</option>
+              <option value="shift_r">仅右 Shift 单键切换 (避开左侧打字误触)</option>
+              <option value="ctrl_both">左右 Ctrl 单键切换 (彻底屏蔽 Shift 误触)</option>
+              <option value="ctrl_l">仅左 Ctrl 单键切换</option>
+              <option value="ctrl_r">仅右 Ctrl 单键切换</option>
+              <option value="none">禁用单键切换 (仅保留 Caps Lock 切换，彻底杜绝误触)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>未完成拼音切换行为</label>
+            <select id="switch-action-select" class="mac-select">
+              <option value="commit_code">直接上屏已输入英文编码并切英文 (commit_code - 推荐)</option>
+              <option value="clear">清除未完成拼音并切英文 (clear)</option>
+              <option value="inline_ascii">行内临时英文模式 (inline_ascii)</option>
+              <option value="commit_text">上屏首选汉字并切英文 (commit_text)</option>
+            </select>
           </div>
 
           <div class="form-group switch-group">

@@ -51,8 +51,8 @@ jian jian de jiu bu zai yi le
 
 ### 1. 克隆或下载本仓库
 ```bash
-git clone https://github.com/your-username/rime-ai-shurufa.git
-cd rime-ai-shurufa
+git clone https://github.com/Love-Neko/Rime-Capsule-AI.git
+cd Rime-Capsule-AI
 ```
 
 ### 2. 双击一键启动懒人包

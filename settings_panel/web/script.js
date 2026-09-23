@@ -60,6 +60,16 @@ async function loadConfig() {
   } catch (err) {
     console.error("加载配置失败:", err);
   }
+
+  // 加载开机自启状态
+  try {
+    const autoRes = await fetch("/api/autostart");
+    const autoData = await autoRes.json();
+    if (autoData && typeof autoData.enabled === "boolean") {
+      const sw = document.getElementById("switch-autostart");
+      if (sw) sw.checked = autoData.enabled;
+    }
+  } catch (e) {}
 }
 
 // 将配置数据同步到各 UI 控件
@@ -222,6 +232,22 @@ function bindEvents() {
   document.getElementById("switch-tab-jev").addEventListener("change", (e) => {
     currentConfig.tab_jev_ai = e.target.checked;
   });
+  const swAuto = document.getElementById("switch-autostart");
+  if (swAuto) {
+    swAuto.addEventListener("change", async (e) => {
+      try {
+        const res = await fetch("/api/autostart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ enable: e.target.checked })
+        });
+        const data = await res.json();
+        showToast(data.message || (e.target.checked ? "已开启开机自启" : "已关闭开机自启"));
+      } catch (err) {
+        showToast("设置开机自启失败: " + err.message);
+      }
+    });
+  }
   document.getElementById("switch-wanxiang").addEventListener("change", (e) => {
     currentConfig.wanxiang_enabled = e.target.checked;
   });

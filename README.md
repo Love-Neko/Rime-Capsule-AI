@@ -18,7 +18,7 @@
 - 🎨 **macOS 极简暗黑胶囊主题（默认内置）**  
   摒弃传统输入法刺眼的亮蓝大色块，采用苹果原装深灰半透明圆角卡片（`#201E1E`）与微亮深灰高亮胶囊（`#423C3C`），文字聚焦纯白，搭配 12pt 苹方粗体（PingFang SC Bold），视觉高级低调。
 - 🧠 **双模 AI 语义重排与预测**  
-  支持 **TypeSafe Jev AI** 毫秒级上下文决策与本地 **Ollama（如 Qwen 8B）** 开源大模型。支持 **`Tab` 键智能召唤模式**：常规打字零进程、零卡顿、极速飞快；仅在需要长句预测或多音词纠偏时按 Tab 键主动召唤 AI（带 `✦ Jev` 标记）。
+  支持 **TypeSafe Jev AI** 毫秒级上下文决策与本地 **Ollama（如 Qwen 8B）** 开源大模型。支持 **`Tab` 键智能召唤模式**：常规打字零进程、零卡顿、极速飞快；支持一键开启 Windows 开机静默后台自启（零黑框），开机随时按 Tab 键主动召唤 AI（带 `✦ Jev` 标记）。
 - 📚 **万象拼音顶级词库与 400MB 语法模型**  
   集成持续活跃维护的 [amzxyz/rime-wanxiang](https://github.com/amzxyz/rime-wanxiang) 全套 20 个精品词典（45MB 基础大词库 + 地名/诗词/搜狗专业词库，编译后达 82MB 检索表）。支持一键加载官方 **400MB Octagram 语法语言模型**，实现大厂级整句智能预测（带 `∞` 标识）。
 - 🎛️ **现代图形化交互设置面板 (Web GUI)**  
@@ -121,9 +121,11 @@ rime-ai-shurufa/
 │   └── wanxiang/                 # 万象核心 Lua 组件集
 │
 ├── tools/                        # 自动化维护工具
+│   ├── autostart.py              # Windows 开机静默后台自启管理脚本
 │   ├── deploy.py                 # 配置同步与编译部署脚本
 │   ├── download_model.py         # 400MB 语法模型断点续传下载工具
-│   └── patch_icons.py            # 托盘图标一键更新为 macOS 蓝中/灰A
+│   ├── patch_icons.py            # 托盘图标一键更新为 macOS 蓝中/灰A
+│   └── render_preview.py         # 4K Retina 超清截图生成脚本
 │
 └── assets/                       # 图标与静态资源
     ├── zh_modern.ico             # 高清 macOS 皇家蓝“中”

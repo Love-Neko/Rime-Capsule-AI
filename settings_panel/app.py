@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT_DIR))
 from tools.deploy import get_default_config, sync_and_deploy
 from tools.download_model import download_grammar_model, get_default_dest, EXPECTED_SIZE
 from tools.patch_icons import run_patch
+from tools.autostart import is_autostart_enabled, enable_autostart, disable_autostart
 
 # 全局模型下载状态追踪
 download_state = {
@@ -177,6 +178,10 @@ class SettingsHandler(SimpleHTTPRequestHandler):
             self.send_json(download_state)
             return
 
+        elif path == "/api/autostart":
+            self.send_json({"ok": True, "enabled": is_autostart_enabled()})
+            return
+
         # 默认静态页面
         if path == "/":
             self.path = "/index.html"
@@ -271,6 +276,12 @@ class SettingsHandler(SimpleHTTPRequestHandler):
             cfg = get_default_config()
             save_settings(cfg)
             self.send_json({"ok": True, "config": cfg, "message": "已恢复开源出厂默认配置！"})
+            return
+
+        elif path == "/api/autostart":
+            enable = bool(payload.get("enable", False))
+            ok, msg = enable_autostart() if enable else disable_autostart()
+            self.send_json({"ok": ok, "message": msg, "enabled": is_autostart_enabled()})
             return
 
         self.send_json({"ok": False, "message": "未知 API"}, code=404)

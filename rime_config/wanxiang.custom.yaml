@@ -3,14 +3,25 @@
 # 可通过项目内置的交互设置面板（打开设置面板.bat）一键定制各项偏好
 
 patch:
-  # 候选词数量（默认 5）
-  menu/page_size: 5
+  # 候选词数量（默认 8）
+  menu/page_size: 8
+
+  # 注册 jev_ai 开关
+  switches/@next:
+    name: jev_ai
+    reset: 0
+    states: [AI关, AI开]
 
   # 挂载 Jev AI 语义重排过滤器
   engine/filters/@next: lua_filter@jev_filter
 
-  # 快捷键绑定（默认标准翻页）
-  key_binder/bindings/+:
+  # 快捷键绑定（引入默认按键预设并绑定翻页与 Tab 键）
+  key_binder/import_preset: default
+  key_binder/bindings:
     - {when: has_menu, accept: minus, send: Page_Up}
     - {when: has_menu, accept: equal, send: Page_Down}
+    - {when: has_menu, accept: bracketleft, send: Page_Up}
+    - {when: has_menu, accept: bracketright, send: Page_Down}
+    - {when: paging, accept: bracketleft, send: Page_Up}
+    - {when: paging, accept: bracketright, send: Page_Down}
     - {when: has_menu, accept: Tab, toggle: jev_ai}

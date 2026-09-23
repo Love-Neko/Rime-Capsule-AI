@@ -28,7 +28,7 @@ def _load_dotenv() -> Path:
 
 def _first_run_key_prompt(env_file: Path) -> None:
     current_key = os.getenv("TYPESAFE_API_KEY", "").strip()
-    if current_key or not sys.stdin.isatty():
+    if current_key or not sys.stdin or not getattr(sys.stdin, "isatty", lambda: False)():
         return
     print("=" * 56)
     print("  欢迎使用 Jev + Rime 智能输入法桥接服务！")

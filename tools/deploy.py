@@ -110,7 +110,7 @@ patch:
 
 def generate_wanxiang_custom_yaml(config):
     """根据配置生成 wanxiang.custom.yaml"""
-    page_size = config.get("page_size", 5)
+    page_size = config.get("page_size", 8)
     ascii_punct = config.get("ascii_punct", False)
     paging_keys = config.get("paging_keys", "minus_equal")
     tab_jev_ai = config.get("tab_jev_ai", True)
@@ -131,7 +131,7 @@ def generate_wanxiang_custom_yaml(config):
     if tab_jev_ai:
         bindings.append("    - {when: has_menu, accept: Tab, toggle: jev_ai}")
 
-    bindings_block = "  key_binder/bindings/+:\n" + "\n".join(bindings)
+    bindings_block = "  key_binder/import_preset: default\n  key_binder/bindings:\n" + "\n".join(bindings)
 
     punct_block = ""
     if ascii_punct:
@@ -144,6 +144,13 @@ def generate_wanxiang_custom_yaml(config):
 patch:
   menu/page_size: {page_size}
 
+  # 注册 jev_ai 开关
+  switches/@next:
+    name: jev_ai
+    reset: 0
+    states: [AI关, AI开]
+
+  # 挂载 Jev AI 语义重排过滤器
   engine/filters/@next: lua_filter@jev_filter
 
 {bindings_block}

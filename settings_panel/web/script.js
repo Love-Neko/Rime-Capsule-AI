@@ -30,6 +30,7 @@ let downloadPollTimer = null;
 
 // 初始化
 document.addEventListener("DOMContentLoaded", () => {
+  renderPreview();
   loadConfig();
   fetchSystemStatus();
   setInterval(fetchSystemStatus, 4000);

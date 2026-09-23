@@ -19,9 +19,9 @@ WEASEL_DIR = Path(r"C:\Program Files\Rime\weasel-0.17.4")
 
 
 def get_default_config():
-    """获取出厂开源默认配置（暗黑胶囊主题，其余标准默认）"""
+    """获取出厂开源默认配置（暗黑胶囊主题，8个候选词，其余标准默认）"""
     return {
-        "page_size": 5,
+        "page_size": 8,
         "ctrl_switch": False,
         "ascii_punct": False,
         "paging_keys": "minus_equal",     # "minus_equal" | "bracket" | "comma_dot"

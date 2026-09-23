@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.spec
+dist/
+build/
+
+# Local Environment & Secrets
+.env
+*.local
+*.key
+
+# Rime User Data & Binaries
+*.userdb/
+*.prism.bin
+*.table.bin
+*.reverse.bin
+*.gram
+*.gram.bak
+build/
+installation.yaml
+user.yaml
+
+# Memory Dumps & Logs
+*.dmp
+*.log
+*.tmp
+rime_jev_req.txt
+rime_jev_res.txt
+
+# Editors & OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Temporary Test Binaries
+TestServer.exe
+*.bak

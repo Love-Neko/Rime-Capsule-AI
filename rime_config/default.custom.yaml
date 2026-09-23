@@ -1,0 +1,30 @@
+# default.custom.yaml
+# 开源默认配置模板（已保留极简暗黑胶囊主题）
+# 其余个性化配置（候选词数量、纯英文标点、单键Ctrl切换、翻页键等）可在交互设置面板中一键开启并部署生效！
+
+patch:
+  # 方案列表
+  schema_list:
+    - {schema: wanxiang}
+    - {schema: luna_pinyin_simp}
+
+  # 默认候选词数量（Rime 官方默认 5 个，可通过设置面板修改为 8、9、10 等）
+  menu/page_size: 5
+
+  # 中英切换行为（开源默认：Shift 切换；可通过设置面板切换为单键 Ctrl 极速切换）
+  ascii_composer/good_old_caps_lock: true
+  ascii_composer/switch_key:
+    Caps_Lock: clear
+    Shift_L: inline_ascii
+    Shift_R: commit_text
+    Control_L: noop
+    Control_R: noop
+
+  # 标点符号映射（开源默认：标准标点；可通过设置面板一键开启“纯英文半角标点模式”）
+  # punctuator/full_shape: ...
+
+  # 快捷键绑定（开源默认：减号/等号翻页；可通过设置面板切换为 [ ] 翻页）
+  key_binder/bindings:
+    - {accept: minus, send: Page_Up, when: has_menu}
+    - {accept: equal, send: Page_Down, when: has_menu}
+    - {accept: Tab, toggle: jev_ai, when: has_menu}

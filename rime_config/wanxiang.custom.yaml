@@ -1,0 +1,16 @@
+# wanxiang.custom.yaml
+# 万象拼音开源默认配置
+# 可通过项目内置的交互设置面板（打开设置面板.bat）一键定制各项偏好
+
+patch:
+  # 候选词数量（默认 5）
+  menu/page_size: 5
+
+  # 挂载 Jev AI 语义重排过滤器
+  engine/filters/@next: lua_filter@jev_filter
+
+  # 快捷键绑定（默认标准翻页）
+  key_binder/bindings/+:
+    - {when: has_menu, accept: minus, send: Page_Up}
+    - {when: has_menu, accept: equal, send: Page_Down}
+    - {when: has_menu, accept: Tab, toggle: jev_ai}

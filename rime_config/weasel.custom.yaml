@@ -1,0 +1,50 @@
+# weasel.custom.yaml
+# 方案 A：macOS 极简深灰胶囊风格（无刺眼蓝块，优雅低调微高亮深灰底色，与暗黑背景自然融合）
+# 字体：苹果原装苹方中黑粗体（PingFang SC Bold），精致 12pt 字号与紧凑 macOS 比例
+patch:
+  "show_notifications": true
+  "show_notifications_time": 600
+  "style/horizontal": true
+  "style/inline_preedit": true
+  "style/font_face": "PingFang SC Bold, PingFang SC Medium, PingFang SC, Microsoft YaHei UI, Segoe UI"
+  "style/label_font_face": "PingFang SC Medium, PingFang SC Bold, Segoe UI, Microsoft YaHei UI"
+  "style/comment_font_face": "PingFang SC Medium, PingFang SC Bold, Segoe UI, Microsoft YaHei UI"
+  "style/font_point": 12
+  "style/label_font_point": 10
+  "style/comment_font_point": 9.5
+  "style/corner_radius": 8
+  "style/round_corner": 5
+  "style/hilited_corner_radius": 5
+  "style/border_width": 0
+  "style/color_scheme": mac_minimal_dark
+
+  "style/layout/align_type": center
+  "style/layout/border_width": 0
+  "style/layout/margin_x": 10
+  "style/layout/margin_y": 6
+  "style/layout/spacing": 6
+  "style/layout/candidate_spacing": 12
+  "style/layout/hilite_spacing": 4
+  "style/layout/hilite_padding": 4
+  "style/layout/round_corner": 5
+  "style/layout/corner_radius": 8
+  "style/layout/shadow_radius": 6
+  "style/layout/shadow_offset_x": 0
+  "style/layout/shadow_offset_y": 2
+
+  "preset_color_schemes/mac_minimal_dark":
+    name: "macOS Minimal Dark / 极简深灰胶囊"
+    author: "Jev"
+    back_color: 0x201E1E                          # 窗口背景深灰 (RGB #1E1E20)
+    border_color: 0x302C2C                        # 窗口极细微弱边框 (RGB #2C2C30)
+    shadow_color: 0x60000000                      # 窗口柔和投影
+    text_color: 0xE6E0E0                          # 编码预编辑文字柔白 (RGB #E0E0E6)
+    hilited_text_color: 0xFFFFFF                  # 编码高亮文字纯白
+    hilited_back_color: 0x201E1E
+    candidate_text_color: 0xDCD8D8                # 普通候选文字浅灰白 (RGB #D8D8DC)
+    label_color: 0x807878                         # 普通候选序号淡灰 2. (RGB #787880)
+    comment_text_color: 0x807878                  # 普通候选注释淡灰
+    hilited_candidate_back_color: 0x423C3C        # 选中高亮深灰微亮胶囊 (RGB #3C3C42, 彻底替代刺眼蓝块)
+    hilited_candidate_text_color: 0xFFFFFF        # 选中高亮文字 纯白聚焦
+    hilited_candidate_label_color: 0xD5D0D0       # 选中序号柔银白 1. (RGB #D0D0D5)
+    hilited_comment_text_color: 0xE8BC9B          # 选中注释 "✦ Jev" 浅冷冰蓝 (RGB #9BBCE8)

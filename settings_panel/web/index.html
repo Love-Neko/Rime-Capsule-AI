@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rime AI 智能输入法控制中心</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 顶部导航与状态栏 -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo-badge">
+          <span class="icon-zh">中</span>
+          <span class="icon-en">A</span>
+        </div>
+        <div class="header-titles">
+          <h1>Rime AI 智能输入法控制中心</h1>
+          <p class="subtitle">小狼毫 Weasel · 万象拼音 · TypeSafe Jev AI · macOS 暗黑胶囊</p>
+        </div>
+      </div>
+      <div class="header-status-pills">
+        <div class="status-pill" id="pill-weasel">
+          <span class="dot"></span>
+          <span class="label">小狼毫: 检测中</span>
+        </div>
+        <div class="status-pill" id="pill-model">
+          <span class="dot"></span>
+          <span class="label">400MB 模型: 检测中</span>
+        </div>
+        <div class="status-pill" id="pill-jev">
+          <span class="dot"></span>
+          <span class="label">Jev AI: 检测中</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 实时候选条动态预览区 -->
+    <section class="preview-section">
+      <div class="section-badge">实时候选条渲染预览 (Live Preview)</div>
+      <div class="preview-box-wrapper">
+        <div class="preedit-line" id="preview-preedit">jian jian de jiu bu zai yi le</div>
+        <div class="candidate-bar" id="preview-bar">
+          <!-- 动态渲染候选词 -->
+        </div>
+      </div>
+      <div class="preview-hint">以上效果完全基于当前设置的字体、字号、暗黑胶囊主题及候选词数量动态绘制</div>
+    </section>
+
+    <!-- 主配置表单栅格 -->
+    <main class="settings-grid">
+      <!-- 卡片 1：界面与外观 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🎨</div>
+          <div>
+            <h2>界面与外观样式</h2>
+            <p>定制输入框候选栏视觉与字形排版</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>预设主题配色</label>
+            <div class="segmented-control" id="theme-control">
+              <button type="button" class="segment-btn active" data-value="mac_minimal_dark">极简暗黑胶囊 (默认)</button>
+              <button type="button" class="segment-btn" data-value="mac_minimal_light">极简浅色胶囊</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>每页候选词数量</label>
+            <div class="segmented-control" id="pagesize-control">
+              <button type="button" class="segment-btn" data-value="5">5 个</button>
+              <button type="button" class="segment-btn" data-value="7">7 个</button>
+              <button type="button" class="segment-btn active" data-value="8">8 个 (推荐)</button>
+              <button type="button" class="segment-btn" data-value="9">9 个</button>
+              <button type="button" class="segment-btn" data-value="10">10 个</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>候选文字字体</label>
+            <select id="font-select" class="mac-select">
+              <option value="PingFang SC Bold, PingFang SC Medium, PingFang SC, Microsoft YaHei UI, Segoe UI">苹方中黑粗体 (PingFang SC Bold - 推荐)</option>
+              <option value="Microsoft YaHei UI, Segoe UI">微软雅黑 (Microsoft YaHei UI)</option>
+              <option value="Segoe UI, Microsoft YaHei UI">系统默认 (Segoe UI)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="label-with-value">
+              <label>字体字号大小</label>
+              <span class="value-badge" id="fontsize-val">12 pt</span>
+            </div>
+            <input type="range" id="fontsize-slider" min="10" max="18" step="0.5" value="12" class="mac-slider">
+          </div>
+
+          <div class="form-group switch-group">
+            <div>
+              <div class="switch-title">横向排列模式</div>
+              <div class="switch-desc">横向水平展开候选条（关闭后为传统纵向列表）</div>
+            </div>
+            <label class="mac-switch">
+              <input type="checkbox" id="switch-horizontal" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 2：输入习惯与快捷键 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">⚡</div>
+          <div>
+            <h2>输入习惯与快捷键</h2>
+            <p>定制符合直觉的高速输入流与按键映射</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group switch-group">
+            <div>
+              <div class="switch-title">单键 Ctrl 极速切换中英文</div>
+              <div class="switch-desc">打完英文按 Ctrl 自动直接上屏并切回中文；彻底屏蔽 Shift 误触</div>
+            </div>
+            <label class="mac-switch">
+              <input type="checkbox" id="switch-ctrl">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="form-group switch-group">
+            <div>
+              <div class="switch-title">纯英文半角标点模式</div>
+              <div class="switch-desc">无论中英状态，标点符号（, . ? ! : ; 等）永远直接输出英文半角</div>
+            </div>
+            <label class="mac-switch">
+              <input type="checkbox" id="switch-punct">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+
+          <div class="form-group">
+            <label>候选词翻页快捷键</label>
+            <select id="paging-select" class="mac-select">
+              <option value="bracket">中括号 [ 上页 / ] 下页 (推荐)</option>
+              <option value="minus_equal">减号 - 上页 / 等号 = 下页 (Rime 传统默认)</option>
+              <option value="comma_dot">逗号 , 上页 / 句号 . 下页</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 3：AI 语义重排与大模型 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">🧠</div>
+          <div>
+            <h2>AI 语义决策与大模型</h2>
+            <p>基于 TypeSafe Jev AI 与本地 Ollama 的上下文预测</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group switch-group">
+            <div>
+              <div class="switch-title">Tab 键智能召唤 Jev AI 决策</div>
+              <div class="switch-desc">常规打字毫秒级零卡顿，按 Tab 键召唤 Jev AI 精准重排与长句联想</div>
+            </div>
+            <label class="mac-switch">
+              <input type="checkbox" id="switch-tab-jev" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <div class="label-with-value">
+              <label>TypeSafe Jev API Key</label>
+              <a href="https://console.typesafe.ai/keys" target="_blank" class="link-small">获取免费 Key ↗</a>
+            </div>
+            <div class="input-with-action">
+              <input type="password" id="input-api-key" class="mac-input" placeholder="请填入您的 Jev API Key">
+              <button type="button" class="btn-secondary" id="btn-toggle-key-eye">👁</button>
+            </div>
+            <div class="field-hint">Key 将安全保存在本机本地 .env 中，已配置 .gitignore，绝不会上传 GitHub。</div>
+          </div>
+
+          <div class="form-group switch-group">
+            <div>
+              <div class="switch-title">接入本地 Ollama 大模型</div>
+              <div class="switch-desc">无网络时可自动调用本地运行的 Qwen 等开源语言模型</div>
+            </div>
+            <label class="mac-switch">
+              <input type="checkbox" id="switch-ollama">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div id="ollama-options" class="collapsible-group" style="display: none;">
+            <div class="form-group">
+              <label>Ollama 服务地址</label>
+              <input type="text" id="input-ollama-url" class="mac-input" value="http://127.0.0.1:11434">
+            </div>
+            <div class="form-group">
+              <label>Ollama 模型名称</label>
+              <input type="text" id="input-ollama-model" class="mac-input" value="qwen3:8b">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 卡片 4：万象拼音与 400MB 语法模型 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">📚</div>
+          <div>
+            <h2>万象词库与 400MB 语法模型</h2>
+            <p>GitHub 最新 amzxyz/rime-wanxiang 全套词库与神经网络语言模型</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group switch-group">
+            <div>
+              <div class="switch-title">启用万象拼音方案</div>
+              <div class="switch-desc">包含 45MB 超大基础词库及 20 套地名/诗词/搜狗专业扩展词库</div>
+            </div>
+            <label class="mac-switch">
+              <input type="checkbox" id="switch-wanxiang" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- 400MB 语法模型下载卡片 -->
+          <div class="model-box">
+            <div class="model-box-header">
+              <div>
+                <div class="model-title">400MB Octagram 整句语法模型</div>
+                <div class="model-filename">wanxiang-lts-zh-hans.gram</div>
+              </div>
+              <span class="status-badge" id="model-status-badge">检测中...</span>
+            </div>
+            <p class="model-desc">
+              加载后将为输入法提供类似大厂的智能整句预测能力（候选词带 <code>∞</code> 标识）。
+              由于模型体积达 400MB，不便直接随 Git 仓提交，推荐在此处一键下载到本机。
+            </p>
+
+            <!-- 下载进度条区 -->
+            <div class="download-progress-container" id="download-progress-container" style="display: none;">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+              <div class="progress-text-row">
+                <span id="progress-status-text">准备下载...</span>
+                <span id="progress-speed-text">0 KB/s</span>
+                <span id="progress-pct-text">0%</span>
+              </div>
+            </div>
+
+            <div class="model-actions">
+              <button type="button" class="btn-secondary" id="btn-download-model">
+                <span class="btn-icon">⬇</span>
+                <span id="btn-download-text">一键下载 / 校验 400MB 模型</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部常驻悬浮控制底栏 -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <button type="button" class="btn-ghost" id="btn-reset-defaults">
+          <span>↺</span> 恢复出厂开源默认
+        </button>
+        <button type="button" class="btn-ghost" id="btn-patch-icons">
+          <span>💎</span> 注入 macOS 胶囊蓝中/灰A 托盘图标
+        </button>
+      </div>
+      <div class="footer-right">
+        <button type="button" class="btn-primary" id="btn-save-deploy">
+          <span class="btn-icon">🚀</span>
+          <span>保存并一键部署到输入法</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast 提示框 -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
